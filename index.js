@@ -1,21 +1,33 @@
 const core = require('@actions/core');
-const wait = require('./wait');
+const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
+const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
 
-
-// most @actions toolkit packages have async methods
-async function run() {
+(async function run() {
   try {
-    const ms = core.getInput('milliseconds');
-    core.info(`Waiting ${ms} milliseconds ...`);
+    const endpoint = core.getInput('endpoint', { required: true });
+    const accessKeyId = core.getInput('aws_access_key_id', { required: true });
+    const secretAccessKey = core.getInput('aws_secret_access_key', { required: true });
+    const bucket = core.getInput('bucket', { required: true });
+    const expires = parseInt(core.getInput('expires', { required: false }));
+    const filePath = core.getInput('file_path', { required: true });
 
-    core.debug((new Date()).toTimeString()); // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
-    await wait(parseInt(ms));
-    core.info((new Date()).toTimeString());
+    const client = new S3Client({
+      forcePathStyle: false, // Configures to use subdomain/virtual calling format.
+      endpoint,
+      credentials: {
+        accessKeyId,
+        secretAccessKey,
+      },
+    });
 
-    core.setOutput('time', new Date().toTimeString());
+    const bucketParams = {
+      Bucket: bucket,
+      Key: filePath,
+    };
+    const url = await getSignedUrl(client, new GetObjectCommand(bucketParams), { expiresIn: expires });
+    core.setOutput('url', url);
+    core.setOutput('url_encoded', Buffer.from(url).toString('base64'));
   } catch (error) {
     core.setFailed(error.message);
   }
-}
-
-run();
+})();
