@@ -10,6 +10,9 @@ inputs:
   endpoint:
     description: 'endpoint to access s3-compatible storage'
     required: true
+  region:
+    description: 'region of the bucket'
+    required: true
   aws_access_key_id:
     description: 'aws access key id'
     required: true

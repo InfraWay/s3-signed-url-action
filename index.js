@@ -10,10 +10,12 @@ const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
     const bucket = core.getInput('bucket', { required: true });
     const expires = parseInt(core.getInput('expires', { required: false }));
     const filePath = core.getInput('file_path', { required: true });
+    const region = core.getInput('region', { required: true });
 
     const client = new S3Client({
       forcePathStyle: false, // Configures to use subdomain/virtual calling format.
       endpoint,
+      region,
       credentials: {
         accessKeyId,
         secretAccessKey,

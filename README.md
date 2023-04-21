@@ -8,6 +8,10 @@ Github Action for getting a signed url to access s3-compatible storage
 
 **Required** endpoint to access s3-compatible storage
 
+### `region`
+
+**Required** region of the bucket
+
 ### `aws_access_key_id`
 
 **Required** aws access key id
